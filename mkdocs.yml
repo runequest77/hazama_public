@@ -1,0 +1,18 @@
+site_name: 那由他の狭間
+site_url: https://runequest77.github.io/hazama_public/
+repo_url: https://github.com/runequest77/hazama_public
+
+theme:
+  name: material
+  features:
+    - navigation.expand
+    - navigation.instant
+    - search.suggest
+    - search.highlight
+
+plugins:
+  - search
+  - awesome-pages   # フォルダ構成→自動ナビ
+
+docs_dir: docs
+use_directory_urls: true
