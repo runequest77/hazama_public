@@ -1,4 +1,11 @@
 title: 那由他の狭間
-theme: just-the-docs
+remote_theme: just-the-docs/just-the-docs
+plugins:
+  - jekyll-remote-theme
+
 url: "https://runequest77.github.io"
 baseurl: "/hazama_public"
+
+# 以降は任意設定
+logo: "/hazama_public/assets/logo.png"
+color_scheme: light
