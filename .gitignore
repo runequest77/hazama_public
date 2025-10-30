@@ -1,0 +1,30 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+
+# Build artifacts
+dist/
+build/
+
+# Node modules (if used)
+node_modules/
+
+# Python cache (if used)
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+*.log
