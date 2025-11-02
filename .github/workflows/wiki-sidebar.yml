@@ -1,0 +1,55 @@
+name: Wiki Sidebar Auto-Gen
+
+on:
+  # Wikiのページ作成/更新で発火
+  gollum:
+  # スクリプトやこのワークフローを更新したときにも発火（任意）
+  push:
+    branches: [ main ]
+    paths:
+      - ".github/workflows/wiki-sidebar.yml"
+      - "scripts/generate_sidebar.py"
+  # 手動実行（任意）
+  workflow_dispatch:
+
+jobs:
+  build:
+    # 生成コミットで無限ループしないためのガード
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Clone wiki repo
+        run: |
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Generate _Sidebar.md
+        run: |
+          python scripts/generate_sidebar.py \
+            --root wiki \
+            --output wiki/_Sidebar.md \
+            --title "Navigation" \
+            --include-home
+
+      - name: Commit & push if changed
+        working-directory: wiki
+        run: |
+          if ! git diff --quiet; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add _Sidebar.md
+            git commit -m "chore(wiki): auto-update _Sidebar.md"
+            git push origin HEAD
+          fi
