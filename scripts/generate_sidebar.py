@@ -1,27 +1,33 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import argparse
 
-def build_sidebar(root: Path, lines: list):
-    for p in sorted(root.iterdir()):
-        if p.name.startswith("_") or p.name.startswith("."):
-            continue
-        if p.is_dir():
-            lines.append(f"<details><summary><strong>{p.name}</strong></summary>")
-            build_sidebar(p, lines)
-            lines.append("</details>")
-        elif p.suffix == ".md":
-            name = p.stem
-            link = str(p.with_suffix("")).replace("\\", "/")
-            lines.append(f"- [[{link}|{name}]]")
+SKIP_FILES = {"_Sidebar.md", "_Footer.md", "Home.md", "home.md"}
+
+def emit(root: Path, cur: Path, lines: list):
+    # ディレクトリ（折りたたみ）
+    for d in sorted(p for p in cur.iterdir() if p.is_dir() and not p.name.startswith(('.', '_'))):
+        lines.append(f"<details><summary><strong>{d.name}</strong></summary>")
+        emit(root, d, lines)
+        lines.append("</details>")
+    # ファイル（相対パスリンク、表示名は拡張子なしのファイル名そのまま）
+    for f in sorted(p for p in cur.iterdir() if p.is_file() and p.suffix == ".md" and p.name not in SKIP_FILES):
+        rel = f.relative_to(root).with_suffix("")         # 相対パス
+        lines.append(f"- [[{rel.as_posix()}|{f.stem}]]")
 
 def main():
-    wiki = Path("wiki").resolve()
-    out = wiki / "_Sidebar.md"
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--root", default=".", help="Wiki repo root (Home.md がある場所)")
+    ap.add_argument("--output", default="_Sidebar.md")
+    args = ap.parse_args()
+
+    root = Path(args.root)
     lines = ["# Navigation", ""]
-    build_sidebar(wiki, lines)
-    lines.append("\n---\n[🏠 Home](Home)\n")
-    out.write_text("\n".join(lines), encoding="utf-8")
-    print(f"Wrote {out}")
+    emit(root, root, lines)
+    lines += ["", "---", "[🏠 Home](Home)"]
+
+    Path(args.output).write_text("\n".join(lines), encoding="utf-8")
+    print(f"Wrote {args.output}")
 
 if __name__ == "__main__":
     main()
