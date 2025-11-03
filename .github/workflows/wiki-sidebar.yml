@@ -35,6 +35,10 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Generate folder indexes
+        run: |
+          python scripts/gen_folder_indexes.py --root wiki
+
       - name: Generate _Sidebar.md
         run: |
           python scripts/generate_sidebar.py \
