@@ -55,12 +55,16 @@ jobs:
       - name: Commit & push if changed
         working-directory: wiki
         run: |
-          if ! git diff --quiet; then
-            git config user.name  "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add _Sidebar.md
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # untracked files (_Sidebar.md 新規作成など) を含めて差分確認
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
             git commit -m "chore(wiki): auto-update _Sidebar.md"
             git push origin HEAD
+          else
+            echo "No changes to commit."
           fi
 
       - name: Upload sidebar artifact
