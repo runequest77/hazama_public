@@ -39,21 +39,6 @@ jobs:
         run: |
           python scripts/gen_folder_indexes.py --root wiki
 
-      - name: Generate _Sidebar.md
-        run: |
-          python scripts/generate_sidebar.py \
-            --root wiki \
-            --output _Sidebar.md
-
-      - name: Debug wiki tree after generation
-        run: |
-          echo "---- git status ----"
-          git -C wiki status
-          echo "---- tree ----"
-          find wiki -maxdepth 2 -type f -name "_Sidebar.md" -print -exec wc -l {} \;
-          echo "---- diff ----"
-          git -C wiki diff -- _Sidebar.md || true
-
       - name: Commit & push if changed
         working-directory: wiki
         run: |
@@ -63,15 +48,8 @@ jobs:
           # untracked files (_Sidebar.md 新規作成など) を含めて差分確認
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
-            git commit -m "chore(wiki): auto-update _Sidebar.md"
+            git commit -m "chore(wiki): auto-update _folder_indexes.md"
             git push origin HEAD
           else
             echo "No changes to commit."
           fi
-
-      - name: Upload sidebar artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: sidebar-md
-          path: wiki/_Sidebar.md
-          if-no-files-found: warn
