@@ -39,9 +39,7 @@ jobs:
         run: |
           python scripts/generate_sidebar.py \
             --root wiki \
-            --output wiki/_Sidebar.md \
-            --title "Navigation" \
-            --include-home
+            --output wiki/_Sidebar.md
 
       - name: Debug wiki tree after generation
         run: |
