@@ -16,13 +16,19 @@ def index_one(root: Path, folder: Path):
 
     lines = [f"# {folder.name}", ""]
     if parent:
-        parent_idx = (parent / f"{parent.name}.md") if parent != root else Path("Home")
-        lines += [f"- **Parent:** [[{rel_no_ext(root, parent_idx)}|{parent.name if parent != root else 'Home'}]]", ""]
+        if parent == root:
+            # ここだけ相対パス計算をしない
+            lines += ["- **Parent:** [[Home|Home]]", ""]
+        else:
+            parent_idx = parent / f"{parent.name}.md"
+            lines += [f"- **Parent:** [[{rel_no_ext(root, parent_idx)}|{parent.name}]]", ""]
+
     if subdirs:
         lines.append("## Subfolders")
         for d in subdirs:
             lines.append(f"- [[{rel_no_ext(root, d / (d.name + '.md'))}|{d.name}]]")
         lines.append("")
+
     if pages:
         lines.append("## Pages")
         for f in pages:
@@ -40,7 +46,7 @@ def walk_and_make(root: Path, cur: Path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".", help="Wiki repo root")
-    args = ap.parseArgs() if hasattr(argparse.ArgumentParser, "parseArgs") else ap.parse_args()
+    args = ap.parse_args()
 
     root = Path(args.root)
     walk_and_make(root, root)
