@@ -43,7 +43,7 @@ jobs:
         run: |
           python scripts/generate_sidebar.py \
             --root wiki \
-            --output wiki/_Sidebar.md
+            --output _Sidebar.md
 
       - name: Debug wiki tree after generation
         run: |
