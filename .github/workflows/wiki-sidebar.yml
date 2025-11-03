@@ -43,6 +43,15 @@ jobs:
             --title "Navigation" \
             --include-home
 
+      - name: Debug wiki tree after generation
+        run: |
+          echo "---- git status ----"
+          git -C wiki status
+          echo "---- tree ----"
+          find wiki -maxdepth 2 -type f -name "_Sidebar.md" -print -exec wc -l {} \;
+          echo "---- diff ----"
+          git -C wiki diff -- _Sidebar.md || true
+
       - name: Commit & push if changed
         working-directory: wiki
         run: |
@@ -53,3 +62,10 @@ jobs:
             git commit -m "chore(wiki): auto-update _Sidebar.md"
             git push origin HEAD
           fi
+
+      - name: Upload sidebar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sidebar-md
+          path: wiki/_Sidebar.md
+          if-no-files-found: warn
